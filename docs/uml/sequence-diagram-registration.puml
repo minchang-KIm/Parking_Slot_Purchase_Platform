@@ -1,0 +1,37 @@
+@startuml 회원가입_시퀀스_다이어그램
+
+actor "사용자" as User
+participant "프론트엔드" as Frontend
+participant "백엔드 API" as Backend
+participant "데이터베이스" as DB
+
+User -> Frontend: 회원가입 페이지 접속
+Frontend --> User: 회원가입 폼 표시
+
+User -> Frontend: 정보 입력\n(이름, 이메일, 비밀번호, 전화번호, 역할)
+Frontend -> Frontend: 클라이언트 측 유효성 검증
+
+alt 유효성 검증 실패
+  Frontend --> User: 입력 오류 표시
+else 유효성 검증 성공
+  Frontend -> Backend: POST /api/auth/register\n{name, email, password, phone, role}
+  Backend -> Backend: 서버 측 유효성 검증
+
+  Backend -> DB: 이메일 중복 확인
+  DB --> Backend: 중복 여부
+
+  alt 이메일 중복
+    Backend --> Frontend: 400 Bad Request\n"이미 존재하는 이메일"
+    Frontend --> User: 중복 오류 메시지
+  else 이메일 사용 가능
+    Backend -> Backend: 비밀번호 해시화
+    Backend -> DB: 사용자 정보 저장
+    DB --> Backend: 저장된 사용자 데이터
+    Backend -> Backend: JWT 토큰 생성
+    Backend --> Frontend: 201 Created\n{user, token}
+    Frontend -> Frontend: 토큰 저장\n(localStorage)
+    Frontend --> User: 회원가입 성공\n홈페이지로 리다이렉트
+  end
+end
+
+@enduml
