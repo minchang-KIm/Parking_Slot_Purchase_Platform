@@ -1,0 +1,108 @@
+@startuml 주차_플랫폼_클래스_다이어그램
+
+' 사용자 관련 클래스
+class User {
+  - _id: ObjectId
+  - name: String
+  - email: String
+  - password: String
+  - phone: String
+  - role: String
+  - avatar: String
+  - address: String
+  - isVerified: Boolean
+  - createdAt: Date
+  + register(): void
+  + login(): void
+  + updateProfile(): void
+  + comparePassword(): Boolean
+}
+
+' 주차공간 클래스
+class ParkingSpace {
+  - _id: ObjectId
+  - owner: ObjectId
+  - title: String
+  - description: String
+  - address: String
+  - location: Object
+  - price: Object
+  - availability: String
+  - spaceType: String
+  - spaceSize: String
+  - features: Array
+  - images: Array
+  - rating: Object
+  - totalBookings: Number
+  - isActive: Boolean
+  + create(): void
+  + update(): void
+  + delete(): void
+  + search(): Array
+}
+
+' 예약 클래스
+class Booking {
+  - _id: ObjectId
+  - user: ObjectId
+  - parkingSpace: ObjectId
+  - startTime: Date
+  - endTime: Date
+  - duration: Object
+  - totalPrice: Number
+  - status: String
+  - paymentStatus: String
+  - vehicleInfo: Object
+  - specialRequests: String
+  + create(): void
+  + cancel(): void
+  + confirm(): void
+  + calculatePrice(): Number
+}
+
+' 결제 클래스
+class Payment {
+  - _id: ObjectId
+  - booking: ObjectId
+  - user: ObjectId
+  - amount: Number
+  - paymentMethod: String
+  - status: String
+  - transactionId: String
+  - paymentProvider: String
+  - paidAt: Date
+  + create(): void
+  + complete(): void
+  + refund(): void
+}
+
+' 리뷰 클래스
+class Review {
+  - _id: ObjectId
+  - parkingSpace: ObjectId
+  - booking: ObjectId
+  - user: ObjectId
+  - rating: Number
+  - comment: String
+  - images: Array
+  - helpful: Number
+  - isVisible: Boolean
+  + create(): void
+  + update(): void
+  + delete(): void
+  + markHelpful(): void
+}
+
+' 관계 정의
+User "1" -- "*" ParkingSpace : owns
+User "1" -- "*" Booking : makes
+User "1" -- "*" Payment : pays
+User "1" -- "*" Review : writes
+
+ParkingSpace "1" -- "*" Booking : has
+ParkingSpace "1" -- "*" Review : receives
+
+Booking "1" -- "1" Payment : requires
+Booking "1" -- "0..1" Review : can have
+
+@enduml
